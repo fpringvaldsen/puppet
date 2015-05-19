@@ -77,14 +77,20 @@ class Puppet::Network::HTTP::Route
   end
 
   def process(request, response)
+    puts "In the process method"
     handlers = @method_handlers[request.method.upcase.intern] || NO_HANDLERS
+    puts "got handlers"
     handlers.each do |handler|
       handler.call(request, response)
     end
-
+    puts "called handlers"
     subrequest = request.route_into(match(request.routing_path).to_s)
+    puts "got subrequest"
     if chained_route = @chained.find { |route| route.matches?(subrequest) }
-      chained_route.process(subrequest, response)
+      puts "processing chained route"
+      returnval = chained_route.process(subrequest, response)
+      puts "processed chained route"
+      returnval
     end
   end
 
